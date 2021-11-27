@@ -5,3 +5,6 @@
 	path = FreeRTOS-Kernel
 	url = git@github.com:FreeRTOS/FreeRTOS-Kernel.git
 	branch = smp
+[submodule "FreeRTOS-Plus-TCP"]
+	path = FreeRTOS-Plus-TCP
+	url = https://github.com/FreeRTOS/FreeRTOS-Plus-TCP.git
