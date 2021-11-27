@@ -60,7 +60,8 @@ target_include_directories(example PUBLIC
 
 target_compile_options(example PUBLIC
     -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-type-limits
-    -Wno-sign-compare -Wno-unused-variable -Wno-format-truncation
+    -Wno-sign-compare -Wno-unused-variable -Wno-format-truncation -Wno-format-overflow
+    -Wno-maybe-uninitialized
 )
 target_compile_definitions(example PUBLIC DEBUG)
 
