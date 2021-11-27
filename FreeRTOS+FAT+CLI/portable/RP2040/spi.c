@@ -122,7 +122,7 @@ bool my_spi_init(spi_t *pSPI) {
     // byte at *ptr. The byte is set to some implementation defined nonzero
     // “set” value and the return value is true if and only if the previous
     // contents were “set”.
-    if (__atomic_test_and_set(&(pSPI->initialized), __ATOMIC_SEQ_CST))
+    if (pSPI->initialized)
         return true;
 
     // The SPI may be shared (using multiple SSs); protect it
@@ -187,6 +187,8 @@ bool my_spi_init(spi_t *pSPI) {
     LED_INIT();
 
     xSemaphoreGiveRecursive(pSPI->mutex);
+    pSPI->initialized = true;
+    
     return true;
 }
 

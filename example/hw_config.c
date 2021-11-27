@@ -27,6 +27,7 @@ socket, which SPI it is driven by, and how it is wired.
 #include "hw_config.h"
 
 void spi0_dma_isr();
+void spi1_dma_isr();
 
 // Hardware Configuration of SPI "objects"
 // Note: multiple SD cards can be driven by one SPI if they use different slave
@@ -50,7 +51,27 @@ static spi_t spis[] = { // One for each SPI.
         .initialized = false, // initialized flag
         .owner = 0,           // Owning task, assigned dynamically
         .mutex = 0            // Guard semaphore, assigned dynamically
-    }};
+    },
+    {
+        .hw_inst = spi1, // SPI component
+        .miso_gpio = 12,
+        .mosi_gpio = 11,
+        .sck_gpio = 10,
+        /* The choice of SD card matters! SanDisk runs at the highest speed. PNY
+           can only mangage 5 MHz. Those are all I've tried. */
+        //.baud_rate = 5000 * 1000,
+        .baud_rate = 12500 * 1000, // The limitation here is SPI slew rate.
+        //.baud_rate = 25 * 1000 * 1000, // Actual frequency: 20833333. Has
+        // worked for me with SanDisk.
+
+        // Following attributes are dynamically assigned
+        .dma_isr = spi1_dma_isr,
+		.irq_num = DMA_IRQ_1,
+        .initialized = false, // initialized flag
+        .owner = 0,           // Owning task, assigned dynamically
+        .mutex = 0            // Guard semaphore, assigned dynamically
+    }
+};
 
 // Hardware Configuration of the SD Card "objects"
 static sd_card_t sd_cards[] = { // One for each SD card
@@ -67,24 +88,10 @@ static sd_card_t sd_cards[] = { // One for each SD card
      .mutex = 0,
      .ff_disk_count = 0,
      .ff_disks = NULL}
-#if defined N_SD_CARDS && N_SD_CARDS > 1    // See CMakeLists.txt
-    ,
-    {
-        .pcName = "sd1",         // Name used to mount device
-        .spi = &spis[0],         // Pointer to the SPI driving this card
-        .ss_gpio = 15,           // The SPI slave select GPIO for this SD card
-        .card_detect_gpio = 14,  // Card detect
-        .card_detected_true = 0, // What the GPIO read returns when a card is
-                                 // present. Use -1 if there is no card detect.
-        // Following attributes are dynamically assigned
-        .m_Status = STA_NOINIT,
-        .sectors = 0,
-        .card_type = 0,
-    }
-#endif
 };
 
 void spi0_dma_isr() { spi_irq_handler(&spis[0]); }
+void spi1_dma_isr() { spi_irq_handler(&spis[1]); }
 
 /* ********************************************************************** */
 size_t sd_get_num() { return count_of(sd_cards); }
@@ -95,6 +102,7 @@ sd_card_t *sd_get_by_num(size_t num) {
         return NULL;
     }
 }
+
 sd_card_t *sd_get_by_name(const char *const name) {
     size_t i;
     for (i = 0; i < sd_get_num(); ++i) {
@@ -103,6 +111,7 @@ sd_card_t *sd_get_by_name(const char *const name) {
     DBG_PRINTF("%s: unknown name %s\n", __func__, name);
     return NULL;
 }
+
 size_t spi_get_num() { return count_of(spis); }
 spi_t *spi_get_by_num(size_t num) {
     if (num <= sd_get_num()) {
@@ -111,4 +120,3 @@ spi_t *spi_get_by_num(size_t num) {
         return NULL;
     }
 }
-/* [] END OF FILE */

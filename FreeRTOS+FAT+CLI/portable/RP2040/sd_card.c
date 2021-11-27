@@ -1104,7 +1104,7 @@ bool sd_init_driver() {
     // byte at *ptr. The byte is set to some implementation defined nonzero
     // “set” value and the return value is true if and only if the previous
     // contents were “set”.
-    if (__atomic_test_and_set(&driver_initialized, __ATOMIC_SEQ_CST))
+    if (driver_initialized)
         return true;
 
     for (size_t i = 0; i < sd_get_num(); ++i) {
@@ -1118,10 +1118,7 @@ bool sd_init_driver() {
         gpio_put(pSD->ss_gpio, 1); // Avoid any glitches when enabling output
         gpio_set_dir(pSD->ss_gpio, GPIO_OUT);
         gpio_put(pSD->ss_gpio, 1); // In case set_dir does anything
-    }
-    for (size_t i = 0; i < spi_get_num(); ++i) {
-        spi_t *pSPI = spi_get_by_num(i);
-        if (!my_spi_init(pSPI)) return false;
+        if (!my_spi_init(pSD->spi)) return false;
     }
     driver_initialized = true;
     return true;
