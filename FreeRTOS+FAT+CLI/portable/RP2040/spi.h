@@ -40,6 +40,7 @@ typedef struct {
     dma_channel_config tx_dma_cfg;
     dma_channel_config rx_dma_cfg;
     irq_handler_t dma_isr;
+	uint irq_num;
     bool initialized;         // Assigned dynamically
     TaskHandle_t owner;       // Assigned dynamically
     SemaphoreHandle_t mutex;  // Assigned dynamically

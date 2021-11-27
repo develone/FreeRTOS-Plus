@@ -46,6 +46,7 @@ static spi_t spis[] = { // One for each SPI.
 
         // Following attributes are dynamically assigned
         .dma_isr = spi0_dma_isr,
+		.irq_num = DMA_IRQ_0,
         .initialized = false, // initialized flag
         .owner = 0,           // Owning task, assigned dynamically
         .mutex = 0            // Guard semaphore, assigned dynamically

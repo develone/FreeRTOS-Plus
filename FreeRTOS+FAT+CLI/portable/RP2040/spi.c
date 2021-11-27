@@ -174,15 +174,15 @@ bool my_spi_init(spi_t *pSPI) {
 
     // Configure the processor to run dma_handler() when DMA IRQ 0 is
     // asserted
-    irq_set_exclusive_handler(DMA_IRQ_0, pSPI->dma_isr);
+    irq_set_exclusive_handler(pSPI->irq_num, pSPI->dma_isr);
 
     /* Any interrupt that uses interrupt-safe FreeRTOS API functions must also
      * execute at the priority defined by configKERNEL_INTERRUPT_PRIORITY. */
-    irq_set_priority(DMA_IRQ_0, 0xFF);  // Lowest urgency.
+    irq_set_priority(pSPI->irq_num, 0xFF);  // Lowest urgency.
 
     // Tell the DMA to raise IRQ line 0 when the channel finishes a block
     dma_channel_set_irq0_enabled(pSPI->rx_dma, true);
-    irq_set_enabled(DMA_IRQ_0, true);
+    irq_set_enabled(pSPI->irq_num, true);
 
     LED_INIT();
 
