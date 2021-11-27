@@ -58,15 +58,13 @@ target_include_directories(example PUBLIC
         #${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}/include
 )
 
-#target_compile_options(example PRIVATE -save-temps)
-#target_compile_options(example PRIVATE -Wall, -Wextra -Wshadow -Wdouble-promotion)
-target_compile_options(example PUBLIC -Wall -Wextra -Wno-unused-function -Wno-unused-parameter)
+target_compile_options(example PUBLIC
+    -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-type-limits
+    -Wno-sign-compare -Wno-unused-variable -Wno-format-truncation
+)
 target_compile_definitions(example PUBLIC DEBUG)
 
-IF (NOT DEFINED N_SD_CARDS)
-    SET(N_SD_CARDS 1)
-ENDIF()
-target_compile_definitions(example PUBLIC DEBUG N_SD_CARDS=${N_SD_CARDS})
+target_compile_definitions(example PUBLIC DEBUG N_SD_CARDS=1)
 
 pico_add_extra_outputs(example)
 
