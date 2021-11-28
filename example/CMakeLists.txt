@@ -6,18 +6,13 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # Pull in Pico SDK (must be before project)
-include(pico_sdk_import.cmake)
+include(../FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/pico_sdk_import.cmake)
 # Pull in FreeRTOS
-include(FreeRTOS_Kernel_import.cmake)
+include(../FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
 project(example C CXX ASM)
 
-##set(PICO_CXX_ENABLE_EXCEPTIONS 1)
-##set(PICO_CXX_ENABLE_RTTI 1)
-
 set(PARAM_ASSERTIONS_ENABLE_ALL 1)
-
-##set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -ggdb")
 
 # Initialise the Pico SDK
 pico_sdk_init()

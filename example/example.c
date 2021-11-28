@@ -1,12 +1,12 @@
 #include <stdio.h>
-//
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOS_time.h"
-//
+
 #include "pico/stdlib.h"
 #include "pico/multicore.h" // get_core_num()
-//
+
 #include "crash.h"
 #include "stdio_cli.h"
 

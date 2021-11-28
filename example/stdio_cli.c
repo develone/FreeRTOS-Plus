@@ -16,19 +16,19 @@
 #include <ctype.h>
 // FreeRTOS
 #include "FreeRTOS.h"
-//
+
 #include "task.h"
 // Pico
 #include "pico/stdlib.h"
 #include "pico/util/queue.h"
-//
+
 #include "hardware/irq.h"
 #include "hardware/rtc.h"
 #include "pico/error.h"
 #include "pico/multicore.h"
 #include "pico/stdio.h"
 #include "pico/util/datetime.h"
-//
+
 #include "CLI-commands.h"
 #include "File-related-CLI-commands.h"
 #include "FreeRTOS_CLI.h"
@@ -62,7 +62,7 @@ static void stdioTask(void *arg) {
             if (buf[0]) printf("\t%s", buf);
         } while (n != 0);
     }
-    if (!rtc_running()) printf("RTC is not running.\n");
+    //if (!rtc_running()) printf("RTC is not running.\n");
     datetime_t t = {0, 0, 0, 0, 0, 0, 0};
     rtc_get_datetime(&t);
     char datetime_buf[256] = {0};
@@ -186,5 +186,3 @@ void CLI_Start() {
         xStack, &xTaskBuffer);
     configASSERT(th);
 }
-
-/* [] END OF FILE */

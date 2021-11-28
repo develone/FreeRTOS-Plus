@@ -1,19 +1,18 @@
 
 #include "FreeRTOS.h" /* Must come first. */
-//
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-//
+
 #include "hardware/adc.h"
 #include "pico/stdlib.h"
-//
+
 #include "FreeRTOS_CLI.h"
 #include "ff_headers.h"
 #include "ff_stdio.h"
 #include "task.h"
-//
-//#include "sd_card.h"
+
 #include "ff_utils.h"
 
 #define DEVICENAME "sd0"
@@ -161,7 +160,6 @@ static void data_log_demo() {
     configASSERT(th);
 }
 
-/*-----------------------------------------------------------*/
 static BaseType_t data_log_demo_cmd(char *pcWriteBuffer, size_t xWriteBufferLen,
                                     const char *pcCommandString) {
     (void)pcCommandString;
@@ -172,10 +170,10 @@ static BaseType_t data_log_demo_cmd(char *pcWriteBuffer, size_t xWriteBufferLen,
 
     return pdFALSE;
 }
+
 const CLI_Command_Definition_t xDataLogDemo = {
     "data_log_demo", /* The command string to type. */
     "\ndata_log_demo:\n Launch data logging task\n",
     data_log_demo_cmd, /* The function to run. */
     0                  /* No parameters are expected. */
 };
-/*-----------------------------------------------------------*/

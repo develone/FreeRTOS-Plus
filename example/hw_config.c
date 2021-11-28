@@ -23,7 +23,7 @@ socket, which SPI it is driven by, and how it is wired.
 */
 
 #include <string.h>
-//
+
 #include "hw_config.h"
 
 void spi0_dma_isr();
@@ -93,7 +93,6 @@ static sd_card_t sd_cards[] = { // One for each SD card
 void spi0_dma_isr() { spi_irq_handler(&spis[0]); }
 void spi1_dma_isr() { spi_irq_handler(&spis[1]); }
 
-/* ********************************************************************** */
 size_t sd_get_num() { return count_of(sd_cards); }
 sd_card_t *sd_get_by_num(size_t num) {
     if (num <= sd_get_num()) {
