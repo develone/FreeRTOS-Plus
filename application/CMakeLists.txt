@@ -31,7 +31,7 @@ pico_set_program_name(application "application")
 pico_set_program_version(application "0.1")
 
 pico_enable_stdio_uart(application 1)
-pico_enable_stdio_usb(application 0)
+pico_enable_stdio_usb(application 1)
 
 # Add the standard library to the build
 target_link_libraries(application 
