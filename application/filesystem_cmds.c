@@ -52,11 +52,11 @@ static void ls() {
     memset(&xFindStruct, 0x00, sizeof(FF_FindData_t));
 
     ff_getcwd(pcWriteBuffer, sizeof(pcWriteBuffer));
-    FF_PRINTF("Directory Listing: %s\n", pcWriteBuffer);
+    printf("Directory Listing: %s\n", pcWriteBuffer);
 
     int iReturned = ff_findfirst("", &xFindStruct);
     if (FF_ERR_NONE != iReturned) {
-        FF_PRINTF("ff_findfirst error: %s (%d)\n", strerror(stdioGET_ERRNO()), -stdioGET_ERRNO());
+        printf("ff_findfirst error: %s (%d)\n", strerror(stdioGET_ERRNO()), -stdioGET_ERRNO());
         return;
     }
     do {
@@ -74,8 +74,8 @@ static void ls() {
         }
         /* Create a string that includes the file name, the file size and the
          attributes string. */
-        FF_PRINTF("%s [%s] [size=%d]\n", xFindStruct.pcFileName, pcAttrib,
-                  (int)xFindStruct.ulFileSize);
+        printf("%s [%s] [size=%d]\n", xFindStruct.pcFileName, pcAttrib,
+               (int)xFindStruct.ulFileSize);
     } while (FF_ERR_NONE == ff_findnext(&xFindStruct));
 }
 
@@ -101,16 +101,7 @@ static BaseType_t runFormat(char* pcWriteBuffer, size_t xWriteBufferLen,
     FF_Disk_t* pxDisk = NULL;
     bool rc = format(&pxDisk, pcParameter);
     if (!rc)
-        FF_PRINTF("Format failed!\n");
-    else {
-        //    	/*Unmount the partition. */
-        //    	FF_Error_t xError = FF_SDDiskUnmount(pxDisk);
-        //        if (FF_isERR( xError ) != pdFALSE) {
-        //        	FF_PRINTF("FF_Unmount: %s\n", (const char *)
-        //        FF_GetErrMessage(xError));
-        //        }
-        //    	FF_SDDiskDelete(pxDisk);
-    }
+        printf("Format failed!\n");
     return pdFALSE;
 }
 
@@ -143,7 +134,7 @@ static BaseType_t runMount(char* pcWriteBuffer, size_t xWriteBufferLen,
     FF_Disk_t* pxDisk = NULL;
     bool rc = mount(&pxDisk, pcParameter, buf);
     if (!rc)
-        FF_PRINTF("Mount failed!\n");
+        printf("Mount failed!\n");
 
     return pdFALSE;
 }

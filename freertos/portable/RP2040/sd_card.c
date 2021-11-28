@@ -480,7 +480,6 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
     // Get rest of the response part for other commands
     switch (cmd) {
         case CMD8_SEND_IF_COND:  // Response R7
-            printf("V2-Version Card\n");
             pSD->card_type = SDCARD_V2;  // fallthrough
             // Note: No break here, need to read rest of the response
         case CMD58_READ_OCR:  // Response R3
@@ -663,18 +662,11 @@ static int sd_initialise_card_nolock(sd_card_t *pSD) {
         if (SD_BLOCK_DEVICE_ERROR_NONE ==
             (status = sd_cmd(pSD, CMD58_READ_OCR, 0x0, 0x0, &response))) {
             // High Capacity card
-            if (response & OCR_HCS_CCS) {
+            if (response & OCR_HCS_CCS)
                 pSD->card_type = SDCARD_V2HC;
-                DBG_PRINTF("Card Initialized: High Capacity Card\n");
-            } else {
-                DBG_PRINTF(
-                    "Card Initialized: Standard Capacity Card: Version 2.x\n");
-            }
         }
-    } else {
+    } else
         pSD->card_type = SDCARD_V1;
-        DBG_PRINTF("Card Initialized: Version 1.x Card\n");
-    }
 
 #if SD_CRC_ENABLED
     if (!crc_on) {
@@ -741,9 +733,9 @@ static uint64_t sd_sectors_nolock(sd_card_t *pSD) {
             capacity = (uint64_t)blocknr *
                        block_len;  // memory capacity = BLOCKNR * BLOCK_LEN
             blocks = capacity / _block_size;
-            printf("Standard Capacity: c_size: %" PRIu32 "\n", c_size);
+            printf("Standard Capacity\n");
             printf("Sectors: 0x%llx : %llu\n", blocks, blocks);
-            printf("Capacity: 0x%llx : %llu MB\n", capacity, (capacity / (1024U * 1024U)));
+            printf("Capacity: %llu MB\n", (capacity / (1024U * 1024U)));
             break;
 
         case 1:
@@ -751,9 +743,9 @@ static uint64_t sd_sectors_nolock(sd_card_t *pSD) {
                 ext_bits(csd, 69, 48);       // device size : C_SIZE : [69:48]
             blocks = (hc_c_size + 1) << 10;  // block count = C_SIZE+1) * 1K
                                              // byte (512B is block size)
-            printf("SDHC/SDXC Card: hc_c_size: %" PRIu32 "\n", hc_c_size);
-            printf("Sectors: %8llu\n", blocks);
-            printf("Capacity: %8llu MB\n", (blocks / (2048U)));
+            printf("SDHC/SDXC Card\n");
+            printf("Sectors: %llu\n", blocks);
+            printf("Capacity: %llu MB\n", (blocks / (2048U)));
             break;
 
         default:

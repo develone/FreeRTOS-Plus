@@ -143,15 +143,11 @@ static BaseType_t prvPWDCommand( char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 /* Structure that defines the DIR command line command, which lists all the
 files in the current directory. */
-static const CLI_Command_Definition_t xDIR =
-{ "dir", /* The command string to type. */
-"\r\ndir:\r\n Lists the files in the current directory\r\n", prvDIRCommand, /* The function to run. */
-	0 /* No parameters are expected. */
-};
-static const CLI_Command_Definition_t xLS =
-{ "ls", /* The command string to type. */
-"ls: Alias for \"dir\"\r\n", prvDIRCommand, /* The function to run. */
-	0 /* No parameters are expected. */
+static const CLI_Command_Definition_t xDIR = {
+    "ls", /* The command string to type. */
+    "\r\nls:\r\n Lists the files in the current directory\r\n",
+    prvDIRCommand, /* The function to run. */
+    0              /* No parameters are expected. */
 };
 
 /* Structure that defines the CD command line command, which changes the
@@ -171,10 +167,11 @@ static const CLI_Command_Definition_t xTYPE =
 };
 
 /* Structure that defines the DEL command line command, which deletes a file. */
-static const CLI_Command_Definition_t xDEL =
-{ "del", /* The command string to type. */
-"\r\ndel <filename>:\r\n deletes a file (use rmdir to delete a directory)\r\n", prvDELCommand, /* The function to run. */
-	1 /* One parameter is expected. */
+static const CLI_Command_Definition_t xDEL = {
+    "rm", /* The command string to type. */
+    "\r\nrm <filename>:\r\n deletes a file (use rmdir to delete a directory)\r\n",
+    prvDELCommand, /* The function to run. */
+    1              /* One parameter is expected. */
 };
 
 /* Structure that defines the RMDIR command line command, which deletes a directory. */
@@ -185,17 +182,19 @@ static const CLI_Command_Definition_t xRMDIR =
 };
 
 /* Structure that defines the COPY command line command, which deletes a file. */
-static const CLI_Command_Definition_t xCOPY =
-{ "copy", /* The command string to type. */
-"\r\ncopy <source file> <dest file>:\r\n Copies <source file> to <dest file>\r\n", prvCOPYCommand, /* The function to run. */
-	2 /* Two parameters are expected. */
+static const CLI_Command_Definition_t xCOPY = {
+    "cp", /* The command string to type. */
+    "\r\ncp <source file> <dest file>:\r\n Copies <source file> to <dest file>\r\n",
+    prvCOPYCommand, /* The function to run. */
+    2               /* Two parameters are expected. */
 };
 
 /* Structure that defines the COPY command line command, which deletes a file. */
-static const CLI_Command_Definition_t xREN =
-{ "ren", /* The command string to type. */
-"\r\nren <source file> <dest file>:\r\n Moves <source file> to <dest file>\r\n", prvRENCommand, /* The function to run. */
-	2 /* Two parameters are expected. */
+static const CLI_Command_Definition_t xREN = {
+    "mv", /* The command string to type. */
+    "\r\nmv <source file> <dest file>:\r\n Moves <source file> to <dest file>\r\n",
+    prvRENCommand, /* The function to run. */
+    2              /* Two parameters are expected. */
 };
 
 /* Structure that defines the pwd command line command, which prints the current working directory. */
@@ -210,7 +209,6 @@ static const CLI_Command_Definition_t xPWD =
 void vRegisterFileSystemCLICommands(void) {
 	/* Register all the command line commands defined immediately above. */
 	FreeRTOS_CLIRegisterCommand( &xDIR );
-	FreeRTOS_CLIRegisterCommand( &xLS );
 	FreeRTOS_CLIRegisterCommand( &xCD );
 	FreeRTOS_CLIRegisterCommand( &xTYPE );
 	FreeRTOS_CLIRegisterCommand( &xDEL );

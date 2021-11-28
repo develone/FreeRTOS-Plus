@@ -51,8 +51,6 @@ static FF_Error_t prvPartitionAndFormatDisk(FF_Disk_t *pxDisk) {
             xPartition.ulHiddenSectors = 2048;
             break;
     }
-    //	xPartition.xPrimaryCount = PRIMARY_PARTITIONS;
-    //	xPartition.eSizeType = eSizeIsQuota;
 
     /* Perform the partitioning. */
     xError = FF_Partition(pxDisk, &xPartition);
@@ -103,6 +101,7 @@ bool mount(FF_Disk_t **ppxDisk, const char *const devName,
     }
     return FF_FS_Add(path, *ppxDisk);
 }
+
 void unmount(FF_Disk_t *pxDisk, const char *pcPath) {
     FF_FS_Remove(pcPath);
 
@@ -254,4 +253,3 @@ int mkdirhier(char *path) {
     return retval;
 }
 
-/* [] END OF FILE */

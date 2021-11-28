@@ -33,7 +33,6 @@ target_sources(FreeRTOS+FAT+CLI INTERFACE
         ../FreeRTOS-Plus-TCP/FreeRTOS_TCP_WIN.c
         ../FreeRTOS-Plus-TCP/FreeRTOS_UDP_IP.c
         portable/RP2040/sd_spi.c
-        portable/RP2040/demo_logging.c
         portable/RP2040/ff_sddisk.c
         portable/RP2040/spi.c
         portable/RP2040/sd_card.c
