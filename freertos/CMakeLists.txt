@@ -11,19 +11,19 @@ target_sources(FreeRTOS+FAT+CLI INTERFACE
         #FreeRTOS-Kernel/portable/GCC/ARM_CM0/port.c 
         ${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}/port.c
         ${FREERTOS_KERNEL_PATH}/portable/MemMang/heap_4.c 
-        ../Lab-Project-FreeRTOS-FAT/ff_crc.c
-        ../Lab-Project-FreeRTOS-FAT/ff_dir.c
-        ../Lab-Project-FreeRTOS-FAT/ff_error.c
-        ../Lab-Project-FreeRTOS-FAT/ff_fat.c
-        ../Lab-Project-FreeRTOS-FAT/ff_file.c
-        ../Lab-Project-FreeRTOS-FAT/ff_format.c
-        ../Lab-Project-FreeRTOS-FAT/ff_ioman.c
-        ../Lab-Project-FreeRTOS-FAT/ff_locking.c
-        ../Lab-Project-FreeRTOS-FAT/ff_memory.c
-        ../Lab-Project-FreeRTOS-FAT/ff_stdio.c
-        ../Lab-Project-FreeRTOS-FAT/ff_string.c
-        ../Lab-Project-FreeRTOS-FAT/ff_sys.c
-        ../Lab-Project-FreeRTOS-FAT/ff_time.c 
+        ../FreeRTOS-Plus-FAT/ff_crc.c
+        ../FreeRTOS-Plus-FAT/ff_dir.c
+        ../FreeRTOS-Plus-FAT/ff_error.c
+        ../FreeRTOS-Plus-FAT/ff_fat.c
+        ../FreeRTOS-Plus-FAT/ff_file.c
+        ../FreeRTOS-Plus-FAT/ff_format.c
+        ../FreeRTOS-Plus-FAT/ff_ioman.c
+        ../FreeRTOS-Plus-FAT/ff_locking.c
+        ../FreeRTOS-Plus-FAT/ff_memory.c
+        ../FreeRTOS-Plus-FAT/ff_stdio.c
+        ../FreeRTOS-Plus-FAT/ff_string.c
+        ../FreeRTOS-Plus-FAT/ff_sys.c
+        ../FreeRTOS-Plus-FAT/ff_time.c 
         portable/RP2040/sd_spi.c
         portable/RP2040/demo_logging.c
         portable/RP2040/ff_sddisk.c
@@ -53,7 +53,7 @@ target_link_libraries(FreeRTOS+FAT+CLI INTERFACE
 )
 target_include_directories(FreeRTOS+FAT+CLI INTERFACE 
         include/ 
-        ../Lab-Project-FreeRTOS-FAT/include/
+        ../FreeRTOS-Plus-FAT/include/
         portable/RP2040/
         ${FREERTOS_KERNEL_PATH}/include 
 #        FreeRTOS-Kernel/portable/GCC/ARM_CM0 #_RP2040
