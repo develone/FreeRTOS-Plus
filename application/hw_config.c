@@ -47,7 +47,7 @@ static spi_t spis[] = { // One for each SPI.
 
         // Following attributes are dynamically assigned
         .dma_isr = spi0_dma_isr,
-		.irq_num = DMA_IRQ_0,
+        .irq_num = DMA_IRQ_0,
         .initialized = false, // initialized flag
         .owner = 0,           // Owning task, assigned dynamically
         .mutex = 0            // Guard semaphore, assigned dynamically
@@ -66,12 +66,11 @@ static spi_t spis[] = { // One for each SPI.
 
         // Following attributes are dynamically assigned
         .dma_isr = spi1_dma_isr,
-		.irq_num = DMA_IRQ_1,
+        .irq_num = DMA_IRQ_1,
         .initialized = false, // initialized flag
         .owner = 0,           // Owning task, assigned dynamically
         .mutex = 0            // Guard semaphore, assigned dynamically
-    }
-};
+    }};
 
 // Hardware Configuration of the SD Card "objects"
 static sd_card_t sd_cards[] = { // One for each SD card
@@ -79,7 +78,7 @@ static sd_card_t sd_cards[] = { // One for each SD card
      .spi = &spis[0],           // Pointer to the SPI driving this card
      .ss_gpio = 5,              // The SPI slave select GPIO for this SD card
      .card_detect_gpio = 8,     // Card detect
-     .card_detected_true = 0,  // What the GPIO read returns when a card is
+     .card_detected_true = 0,   // What the GPIO read returns when a card is
                                 // present. Use -1 if there is no card detect.
      // Following attributes are dynamically assigned
      .m_Status = STA_NOINIT,
@@ -87,14 +86,13 @@ static sd_card_t sd_cards[] = { // One for each SD card
      .card_type = 0,
      .mutex = 0,
      .ff_disk_count = 0,
-     .ff_disks = NULL}
-};
+     .ff_disks = NULL}};
 
 void spi0_dma_isr() { spi_irq_handler(&spis[0]); }
 void spi1_dma_isr() { spi_irq_handler(&spis[1]); }
 
 size_t sd_get_num() { return count_of(sd_cards); }
-sd_card_t *sd_get_by_num(size_t num) {
+sd_card_t* sd_get_by_num(size_t num) {
     if (num <= sd_get_num()) {
         return &sd_cards[num];
     } else {
@@ -102,17 +100,18 @@ sd_card_t *sd_get_by_num(size_t num) {
     }
 }
 
-sd_card_t *sd_get_by_name(const char *const name) {
+sd_card_t* sd_get_by_name(const char* const name) {
     size_t i;
     for (i = 0; i < sd_get_num(); ++i) {
-        if (0 == strcmp(sd_cards[i].pcName, name)) return &sd_cards[i];
+        if (0 == strcmp(sd_cards[i].pcName, name))
+            return &sd_cards[i];
     }
     DBG_PRINTF("%s: unknown name %s\n", __func__, name);
     return NULL;
 }
 
 size_t spi_get_num() { return count_of(spis); }
-spi_t *spi_get_by_num(size_t num) {
+spi_t* spi_get_by_num(size_t num) {
     if (num <= sd_get_num()) {
         return &spis[num];
     } else {

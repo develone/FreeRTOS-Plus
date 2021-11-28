@@ -10,7 +10,7 @@ include(../FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/pico_sdk_import.cmake)
 # Pull in FreeRTOS
 include(../FreeRTOS-Kernel/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
-project(example C CXX ASM)
+project(application C CXX ASM)
 
 set(PARAM_ASSERTIONS_ENABLE_ALL 1)
 
@@ -20,24 +20,24 @@ pico_sdk_init()
 add_subdirectory(../freertos build)
 
 # Add executable. Default name is the project name, version 0.1
-add_executable(example
-        example.c
+add_executable(application
+        application.c
         hw_config.c
         stdio_cli.c
         filesystem_cmds.c
 )
 
-pico_set_program_name(example "example")
-pico_set_program_version(example "0.1")
+pico_set_program_name(application "application")
+pico_set_program_version(application "0.1")
 
-pico_enable_stdio_uart(example 1)
-pico_enable_stdio_usb(example 0)
+pico_enable_stdio_uart(application 1)
+pico_enable_stdio_usb(application 0)
 
 # Add the standard library to the build
-target_link_libraries(example 
+target_link_libraries(application 
         FreeRTOS+FAT+CLI
 )
-target_include_directories(example PUBLIC 
+target_include_directories(application PUBLIC 
 		.
         ../FreeRTOS+FAT+CLI/FreeRTOS-Plus-FAT/include
         ../FreeRTOS+FAT+CLI/FreeRTOS-Plus-TCP/include
@@ -47,14 +47,14 @@ target_include_directories(example PUBLIC
         #${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}/include
 )
 
-target_compile_options(example PUBLIC
+target_compile_options(application PUBLIC
     -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -Wno-type-limits
     -Wno-sign-compare -Wno-unused-variable -Wno-format-truncation -Wno-format-overflow
     -Wno-maybe-uninitialized
 )
-target_compile_definitions(example PUBLIC DEBUG)
+target_compile_definitions(application PUBLIC DEBUG)
 
-target_compile_definitions(example PUBLIC DEBUG N_SD_CARDS=1)
+target_compile_definitions(application PUBLIC DEBUG N_SD_CARDS=1)
 
-pico_add_extra_outputs(example)
+pico_add_extra_outputs(application)
 
