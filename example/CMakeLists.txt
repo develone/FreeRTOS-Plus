@@ -30,8 +30,6 @@ add_executable(example
         tests/big_file_test.c
         tests/ff_stdio_tests_with_cwd.c
         tests/my_test.c
-        tests/mt_lliot.c
-        data_log_demo.c
 )
 
 pico_set_program_name(example "example")

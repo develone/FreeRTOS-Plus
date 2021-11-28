@@ -48,9 +48,6 @@ extern void vMultiTaskStdioWithCWDTest2(const char *pcMountPath0,
 extern void vStdioWithCWDTest(const char *pcMountPath);
 extern void vMultiTaskStdioWithCWDTest(const char *const pcMountPath,
                                        uint16_t usStackSizeWords);
-extern void big_file_test(const char *const pathname, size_t size,
-                          uint32_t seed);
-
 static void ls() {
     char pcWriteBuffer[128] = {0};
 
@@ -90,132 +87,6 @@ static void ls() {
 // Maximum number of elements in buffer
 #define BUFFER_MAX_LEN 10
 
-// Adapted from "FATFileSystem example"
-//  at https://os.mbed.com/docs/mbed-os/v5.15/apis/fatfilesystem.html
-static void prvSimpleTest() {
-    int err = 0;
-
-    FF_PRINTF("\nSimple Test\n");
-
-    // Open the numbers file
-    FF_PRINTF("Opening \"/fs/numbers.txt\"... ");
-    FF_FILE *f = ff_fopen("/fs/numbers.txt", "r+");
-    FF_PRINTF("%s\n", (!f ? "Fail :(" : "OK"));
-    fflush(stdout);
-    if (!f) {
-        // Create the numbers file if it doesn't exist
-        FF_PRINTF("No file found, creating a new file... ");
-        fflush(stdout);
-        f = ff_fopen("/fs/numbers.txt", "w+");
-        FF_PRINTF("%s\n", (!f ? "Fail :(" : "OK"));
-        fflush(stdout);
-        if (!f) {
-            FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                      -stdioGET_ERRNO());
-            return;
-        }
-        for (int i = 0; i < 10; i++) {
-            FF_PRINTF("\rWriting numbers (%d/%d)... ", i, 10);
-            fflush(stdout);
-            err = ff_fprintf(f, "    %d\n", i);
-            if (err < 0) {
-                FF_PRINTF("Fail :(\n");
-                FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                          -stdioGET_ERRNO());
-            }
-        }
-        FF_PRINTF("\rWriting numbers (%d/%d)... OK\n", 10, 10);
-        fflush(stdout);
-
-        FF_PRINTF("Seeking file... ");
-        err = ff_fseek(f, 0, FF_SEEK_SET);
-        FF_PRINTF("%s\n", (err < 0 ? "Fail :(" : "OK"));
-        fflush(stdout);
-        if (err < 0) {
-            FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                      -stdioGET_ERRNO());
-        }
-    }
-    // Go through and increment the numbers
-    for (int i = 0; i < 10; i++) {
-        FF_PRINTF("\nIncrementing numbers (%d/%d)... ", i, 10);
-
-        // Get current stream position
-        long pos = ff_ftell(f);
-
-        // Parse out the number and increment
-        char buf[BUFFER_MAX_LEN];
-        if (!ff_fgets(buf, BUFFER_MAX_LEN, f)) {
-            FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                      -stdioGET_ERRNO());
-        }
-        char *endptr;
-        int32_t number = strtol(buf, &endptr, 10);
-        if ((endptr == buf) ||            // No character was read
-            (*endptr && *endptr != '\n')  // The whole input was not converted
-        ) {
-            continue;
-        }
-        number += 1;
-
-        // Seek to beginning of number
-        ff_fseek(f, pos, FF_SEEK_SET);
-
-        // Store number
-        ff_fprintf(f, "    %d\n", (int)number);
-
-        // Flush between write and read on same file
-        //         ff_fflush(f);
-    }
-    FF_PRINTF("\rIncrementing numbers (%d/%d)... OK\n", 10, 10);
-    fflush(stdout);
-
-    // Close the file which also flushes any cached writes
-    FF_PRINTF("Closing \"/fs/numbers.txt\"... ");
-    err = ff_fclose(f);
-    FF_PRINTF("%s\n", (err < 0 ? "Fail :(" : "OK"));
-    fflush(stdout);
-    if (err < 0) {
-        FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                  -stdioGET_ERRNO());
-    }
-
-    ls();
-
-    err = ff_chdir("fs");
-    if (err < 0) {
-        FF_PRINTF("chdir error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                  -stdioGET_ERRNO());
-    }
-
-    ls();
-
-    // Display the numbers file
-    FF_PRINTF("Opening \"/fs/numbers.txt\"... ");
-    f = ff_fopen("/fs/numbers.txt", "r");
-    FF_PRINTF("%s\n", (!f ? "Fail :(" : "OK"));
-    fflush(stdout);
-    if (!f) {
-        FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                  -stdioGET_ERRNO());
-    }
-
-    FF_PRINTF("numbers:\n");
-    while (!ff_feof(f)) {
-        int c = ff_fgetc(f);
-        FF_PRINTF("%c", c);
-    }
-
-    FF_PRINTF("\nClosing \"/fs/numbers.txt\"... ");
-    err = ff_fclose(f);
-    FF_PRINTF("%s\n", (err < 0 ? "Fail :(" : "OK"));
-    fflush(stdout);
-    if (err < 0) {
-        FF_PRINTF("error: %s (%d)\n", strerror(stdioGET_ERRNO()),
-                  -stdioGET_ERRNO());
-    }
-}
-
 /*-----------------------------------------------------------*/
 static BaseType_t runFormat(char *pcWriteBuffer, size_t xWriteBufferLen,
                             const char *pcCommandString) {
@@ -247,6 +118,7 @@ static BaseType_t runFormat(char *pcWriteBuffer, size_t xWriteBufferLen,
     }
     return pdFALSE;
 }
+
 static const CLI_Command_Definition_t xFormat = {
     "format", /* The command string to type. */
     "\nformat <device name>:\n Format <device name>\n"
@@ -254,7 +126,7 @@ static const CLI_Command_Definition_t xFormat = {
     runFormat, /* The function to run. */
     1          /* One parameter is expected. */
 };
-/*-----------------------------------------------------------*/
+
 static BaseType_t runMount(char *pcWriteBuffer, size_t xWriteBufferLen,
                            const char *pcCommandString) {
     (void)pcWriteBuffer;
@@ -279,6 +151,7 @@ static BaseType_t runMount(char *pcWriteBuffer, size_t xWriteBufferLen,
 
     return pdFALSE;
 }
+
 static const CLI_Command_Definition_t xMount = {
     "mount", /* The command string to type. */
     "\nmount <device name>:\n Mount <device name> at /<device name>\n"
@@ -286,7 +159,7 @@ static const CLI_Command_Definition_t xMount = {
     runMount, /* The function to run. */
     1         /* One parameter is expected. */
 };
-/*-----------------------------------------------------------*/
+
 static BaseType_t runEject(char *pcWriteBuffer, size_t xWriteBufferLen,
                            const char *pcCommandString) {
     (void)pcWriteBuffer;
@@ -310,6 +183,7 @@ static BaseType_t runEject(char *pcWriteBuffer, size_t xWriteBufferLen,
 
     return pdFALSE;
 }
+
 static const CLI_Command_Definition_t xEject = {
     "eject", /* The command string to type. */
     "\neject <device name>:\n Eject <device name>\n"
@@ -317,326 +191,13 @@ static const CLI_Command_Definition_t xEject = {
     runEject, /* The function to run. */
     1         /* One parameter is expected. */
 };
+
 static const CLI_Command_Definition_t xUnmount = {
     "unmount", /* The command string to type. */
     "unmount: Alias for \"eject\"\n",
     runEject, /* The function to run. */
     1         /* One parameter is expected. */
 };
-/*-----------------------------------------------------------*/
-static BaseType_t runLLIOTCommand(char *pcWriteBuffer, size_t xWriteBufferLen,
-                                  const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-
-    low_level_io_tests(pcParameter);
-
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xLowLevIOTests = {
-    "lliot", /* The command string to type. */
-    "\nlliot <device name>:\n !DESTRUCTIVE! Low Level I/O Driver Test\n"
-    "\te.g.: \"lliot sd0\"\n",
-    runLLIOTCommand, /* The function to run. */
-    1                /* One parameter is expected. */
-};
-/*-----------------------------------------------------------*/
-void vCreateAndVerifyExampleFiles(
-    const char *pcMountPath);  // in CreateAndVerifyExampleFiles.c
-
-static BaseType_t runCreateDiskAndExampleFiles(char *pcWriteBuffer,
-                                               size_t xWriteBufferLen,
-                                               const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-    char buf[cmdMAX_INPUT_SIZE];
-    snprintf(buf, cmdMAX_INPUT_SIZE, "/%s", pcParameter);  // Add '/' for path
-    FF_Disk_t *pxDisk = NULL;
-    bool rc = mount(&pxDisk, pcParameter, buf);
-    configASSERT(rc);
-
-    vCreateAndVerifyExampleFiles(buf);
-
-    // unmount(pxDisk, buf);
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xExampFiles = {
-    "cdef", /* The command string to type. */
-    "\ncdef <device name>:\n Create Disk and Example Files\n"
-    "Expects card to be already formatted but not mounted.\n"
-    "\te.g.: \"cdef sd0\"\n",
-    runCreateDiskAndExampleFiles, /* The function to run. */
-    1                             /* One parameter is expected. */
-};
-/*-----------------------------------------------------------*/
-static BaseType_t runStdioWithCWDTest(char *pcWriteBuffer,
-                                      size_t xWriteBufferLen,
-                                      const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-    char buf[cmdMAX_INPUT_SIZE];
-    snprintf(buf, cmdMAX_INPUT_SIZE, "/%s", pcParameter);  // Add '/' for path
-    FF_Disk_t *pxDisk = NULL;
-    bool rc = mount(&pxDisk, pcParameter, buf);
-    configASSERT(rc);
-
-    // Clear out leftovers from earlier runs
-    ff_chdir(buf);
-    ff_remove("Dummy.txt");
-    ff_deltree("source_dir");
-    ff_deltree("destination_dir");
-
-    vStdioWithCWDTest(buf);
-
-    // unmount(pxDisk, buf);
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xStdioWithCWDTest = {
-    "swcwdt", /* The command string to type. */
-    "\nswcwdt <device name>:\n Stdio With CWD Test\n"
-    "Expects card to be already formatted but not mounted.\n"
-    "Note: run cdef first!"
-    "\te.g.: \"swcwdt sd0\"\n",
-    runStdioWithCWDTest, /* The function to run. */
-    1                    /* No parameters are expected. */
-};
-/*-----------------------------------------------------------*/
-static BaseType_t runMultiTaskStdioWithCWDTest(char *pcWriteBuffer,
-                                               size_t xWriteBufferLen,
-                                               const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-    char buf[cmdMAX_INPUT_SIZE];
-    snprintf(buf, cmdMAX_INPUT_SIZE, "/%s", pcParameter);  // Add '/' for path
-    FF_Disk_t *pxDisk = NULL;
-    bool rc = mount(&pxDisk, pcParameter, buf);
-    configASSERT(rc);
-
-    // Clear out leftovers from earlier runs
-    size_t i;
-    for (i = 0; i <= 4; ++i) {
-        snprintf(buf, cmdMAX_INPUT_SIZE, "/%s/%u", pcParameter, i);
-        ff_deltree(buf);
-    }
-    snprintf(buf, cmdMAX_INPUT_SIZE, "/%s", pcParameter);  // Add '/' for path
-    vMultiTaskStdioWithCWDTest(buf, 768);
-
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xMultiTaskStdioWithCWDTest = {
-    "mtswcwdt", /* The command string to type. */
-    "\nmtswcwdt <device name>:\n MultiTask Stdio With CWD Test\n"
-    "Expects card to be already formatted but not mounted.\n"
-    "\te.g.: \"mtswcwdt sd0\"\n",
-    runMultiTaskStdioWithCWDTest, /* The function to run. */
-    1                             /* parameters are expected. */
-};
-/*-----------------------------------------------------------*/
-static BaseType_t runMultiTaskStdioWithCWDTest2(char *pcWriteBuffer,
-                                                size_t xWriteBufferLen,
-                                                const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    char mntpnt0[cmdMAX_INPUT_SIZE];
-    char mntpnt1[cmdMAX_INPUT_SIZE];
-    char buf[cmdMAX_INPUT_SIZE + 2];
-    FF_Disk_t *pxDisk = NULL;
-    bool rc;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        2,                      /* Return the second parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-
-    snprintf(mntpnt1, xParameterStringLength + 2, "/%s",
-             pcParameter);  // Add '/' for path
-    rc = mount(&pxDisk, pcParameter, mntpnt1);
-    configASSERT(rc);
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-
-    snprintf(mntpnt0, xParameterStringLength + 2, "/%s",
-             pcParameter);  // Add '/' for path
-    rc = mount(&pxDisk, pcParameter, mntpnt0);
-    configASSERT(rc);
-
-    // Clear out leftovers from earlier runs
-    for (size_t i = 0; i <= 4; ++i) {
-        snprintf(buf, sizeof(buf), "%s/%u", mntpnt0, i);
-        ff_deltree(buf);
-    }
-    for (size_t i = 0; i <= 4; ++i) {
-        snprintf(buf, sizeof(buf), "%s/%u", mntpnt1, i);
-        ff_deltree(buf);
-    }
-
-    vMultiTaskStdioWithCWDTest2(mntpnt0, mntpnt1, 750);
-
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xMultiTaskStdioWithCWDTest2 = {
-    "mtswcwdt2", /* The command string to type. */
-    "\nmtswcwdt2 <device name 0> <device name 1>:\n MultiTask Stdio With CWD "
-    "Test on two mountpoints\n"
-    "Expects cards to be already formatted but not mounted.\n"
-    "\te.g.: \"mtswcwdt2 sd0 sd1\"\n",
-    runMultiTaskStdioWithCWDTest2, /* The function to run. */
-    2                              /* parameters are expected. */
-};
-/*-----------------------------------------------------------*/
-static BaseType_t runSimpleFSTest(char *pcWriteBuffer, size_t xWriteBufferLen,
-                                  const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-
-    FF_Disk_t *pxDisk = NULL;
-    bool rc = mount(&pxDisk, pcParameter, "/fs");
-    configASSERT(rc);
-
-    prvSimpleTest();
-
-    //	unmount(pxDisk, "/fs");
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xSimpleFSTest = {
-    "simple", /* The command string to type. */
-    "\nsimple <device name>:\n Run simple FS tests\n"
-    "Expects card to already be formatted but not mounted.\n"
-    "\te.g.: \"simple sd0\"\n",
-    runSimpleFSTest, /* The function to run. */
-    1                /* One parameter is expected. */
-};
-/*-----------------------------------------------------------*/
-static BaseType_t prvBigFileTest(char *pcWriteBuffer, size_t xWriteBufferLen,
-                                 const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-    char *pcPathName;
-    const char *pcSeed, *pcSize;
-    size_t size;
-    uint32_t seed;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the seed. */
-    pcSeed = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        3,                      /* Return the third parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcSeed);
-    seed = atoi(pcSeed);
-
-    /* Obtain the file size. */
-    pcSize = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        2,                      /* Return the second parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcSize);
-    size = strtoul(pcSize, 0, 0);
-
-    /* Obtain the pathname. */
-    pcPathName = (char *)FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcPathName);
-
-    /* Terminate the string. */
-    pcPathName[xParameterStringLength] = 0x00;
-
-    big_file_test(pcPathName, size, seed);
-
-    return pdFALSE;
-}
-/* Structure that defines the COPY command line command, which deletes a file.
- */
-static const CLI_Command_Definition_t xBFT = {
-    "big_file_test", /* The command string to type. */
-    "\r\nbig_file_test <pathname> <size in bytes> <seed>:\n"
-    " Writes random data to file <pathname>.\n"
-    " <size in bytes> must be multiple of 512.\n"
-    "\te.g.: big_file_test sd0/bf 1048576 1\n"
-    "\tor: big_file_test sd0/big3G-3 0xC0000000 3\n",
-    prvBigFileTest, /* The function to run. */
-    3               /* Two parameters are expected. */
-};
-/*-----------------------------------------------------------*/
 
 void register_fs_tests() {
     /* Register all the command line commands defined immediately above. */
@@ -646,14 +207,4 @@ void register_fs_tests() {
     FreeRTOS_CLIRegisterCommand(&xMount);
     FreeRTOS_CLIRegisterCommand(&xEject);
     FreeRTOS_CLIRegisterCommand(&xUnmount);
-    FreeRTOS_CLIRegisterCommand(&xLowLevIOTests);
-    FreeRTOS_CLIRegisterCommand(&xMTLowLevIOTests);
-    FreeRTOS_CLIRegisterCommand(&xSimpleFSTest);
-    FreeRTOS_CLIRegisterCommand(&xExampFiles);
-    FreeRTOS_CLIRegisterCommand(&xStdioWithCWDTest);
-    FreeRTOS_CLIRegisterCommand(&xMultiTaskStdioWithCWDTest);
-    FreeRTOS_CLIRegisterCommand(&xMultiTaskStdioWithCWDTest2);
-    FreeRTOS_CLIRegisterCommand(&xBFT);
 }
-
-/* [] END OF FILE */
