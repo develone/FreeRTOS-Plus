@@ -871,37 +871,6 @@ static const CLI_Command_Definition_t xDate = {
     "\ndate:\n Print current date and time\n\n", date, /* The function to run. */
     0 /* No parameters are expected. */
 };
-/*-----------------------------------------------------------*/
-/*-----------------------------------------------------------*/
-extern void my_test(int v);
-static BaseType_t test(char *pcWriteBuffer, size_t xWriteBufferLen,
-                       const char *pcCommandString) {
-    (void)pcWriteBuffer;
-    (void)xWriteBufferLen;
-
-    const char *pcParameter;
-    BaseType_t xParameterStringLength;
-
-    /* Obtain the parameter string. */
-    pcParameter = FreeRTOS_CLIGetParameter(
-        pcCommandString,        /* The command string itself. */
-        1,                      /* Return the first parameter. */
-        &xParameterStringLength /* Store the parameter string length. */
-    );
-    /* Sanity check something was returned. */
-    configASSERT(pcParameter);
-
-    my_test(atoi(pcParameter));
-    //    test_harness();
-
-    return pdFALSE;
-}
-static const CLI_Command_Definition_t xTest = {
-    "test", /* The command string to type. */
-    "\ntest <number>:\n Development test\n", test, /* The function to run. */
-    1 /* One parameter is expected. */
-};
-/*-----------------------------------------------------------*/
 
 void vRegisterCLICommands(void) {
     static BaseType_t xCommandRegistered = pdFALSE;
@@ -912,8 +881,6 @@ void vRegisterCLICommands(void) {
         FreeRTOS_CLIRegisterCommand(&xTaskStats);
         FreeRTOS_CLIRegisterCommand(&xRunTimeStats);
         FreeRTOS_CLIRegisterCommand(&xHeapStats);
-        //		FreeRTOS_CLIRegisterCommand( &xThreeParameterEcho );
-        //		FreeRTOS_CLIRegisterCommand( &xParameterEcho );
         FreeRTOS_CLIRegisterCommand(&xCLS);
 
 #if ipconfigSUPPORT_OUTGOING_PINGS == 1
@@ -944,6 +911,5 @@ void vRegisterMyCLICommands(void) {
     FreeRTOS_CLIRegisterCommand(&xDate);
     FreeRTOS_CLIRegisterCommand(&xDie);
     FreeRTOS_CLIRegisterCommand(&xUnDie);
-    FreeRTOS_CLIRegisterCommand(&xTest);
     FreeRTOS_CLIRegisterCommand(&xReset);
 }

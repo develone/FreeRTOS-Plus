@@ -24,12 +24,7 @@ add_executable(example
         example.c
         hw_config.c
         stdio_cli.c
-        tests/app4-IO_module_function_checker.c        
-        tests/filesystem_test_suite.c
-        tests/CreateAndVerifyExampleFiles.c        
-        tests/big_file_test.c
-        tests/ff_stdio_tests_with_cwd.c
-        tests/my_test.c
+        filesystem_cmds.c
 )
 
 pico_set_program_name(example "example")
@@ -43,8 +38,9 @@ target_link_libraries(example
         FreeRTOS+FAT+CLI
 )
 target_include_directories(example PUBLIC 
-        include/ 
+		.
         ../FreeRTOS+FAT+CLI/FreeRTOS-Plus-FAT/include
+        ../FreeRTOS+FAT+CLI/FreeRTOS-Plus-TCP/include
         ../FreeRTOS+FAT+CLI/portable/RP2040
         ../FreeRTOS+FAT+CLI/include
         #${FREERTOS_KERNEL_PATH}/include 

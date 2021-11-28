@@ -6,7 +6,6 @@ target_sources(FreeRTOS+FAT+CLI INTERFACE
         ${FREERTOS_KERNEL_PATH}/stream_buffer.c
         ${FREERTOS_KERNEL_PATH}/tasks.c
         ${FREERTOS_KERNEL_PATH}/timers.c 
-#${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}        
         #FreeRTOS-Kernel/portable/GCC/ARM_CM0_RP2040/port.c 
         #FreeRTOS-Kernel/portable/GCC/ARM_CM0/port.c 
         ${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}/port.c
@@ -24,6 +23,15 @@ target_sources(FreeRTOS+FAT+CLI INTERFACE
         ../FreeRTOS-Plus-FAT/ff_string.c
         ../FreeRTOS-Plus-FAT/ff_sys.c
         ../FreeRTOS-Plus-FAT/ff_time.c 
+        ../FreeRTOS-Plus-TCP/FreeRTOS_ARP.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_DHCP.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_DNS.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_IP.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_Sockets.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_Stream_Buffer.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_TCP_IP.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_TCP_WIN.c
+        ../FreeRTOS-Plus-TCP/FreeRTOS_UDP_IP.c
         portable/RP2040/sd_spi.c
         portable/RP2040/demo_logging.c
         portable/RP2040/ff_sddisk.c
@@ -54,8 +62,8 @@ target_link_libraries(FreeRTOS+FAT+CLI INTERFACE
 target_include_directories(FreeRTOS+FAT+CLI INTERFACE 
         include/ 
         ../FreeRTOS-Plus-FAT/include/
+        ../FreeRTOS-Plus-TCP/include/
         portable/RP2040/
         ${FREERTOS_KERNEL_PATH}/include 
-#        FreeRTOS-Kernel/portable/GCC/ARM_CM0 #_RP2040
         ${FREERTOS_KERNEL_PATH}/${FREERTOS_KERNEL_RP2040_RELATIVE_PATH}/include
 )

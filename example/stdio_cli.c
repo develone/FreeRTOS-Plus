@@ -33,7 +33,7 @@
 #include "File-related-CLI-commands.h"
 #include "FreeRTOS_CLI.h"
 #include "crash.h"
-#include "filesystem_test_suite.h"
+#include "filesystem_cmds.h"
 #include "stdio_cli.h"
 #include "sd_card.h"
 
