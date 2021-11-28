@@ -8,35 +8,32 @@
  * WHICH IS THE PROPERTY OF your company.
  *
  * ========================================
-*/
+ */
 
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
-#include <stddef.h>    
+#include <stddef.h>
 #include <stdint.h>
 
 #include "hardware/structs/scb.h"
 
 // works with negative index
-static inline int wrap_ix(int index, int n)
-{
-    return ((index % n) + n) % n;
-}
+static inline int wrap_ix(int index, int n) { return ((index % n) + n) % n; }
 
-__attribute__((always_inline)) static inline uint32_t calculate_checksum(uint32_t const *p, size_t const size){
-	uint32_t checksum = 0;
-	for (uint32_t i = 0; i < (size/sizeof(uint32_t))-1; i++){
-		checksum ^= *p;
-		p++;
-	}
-	return checksum;
+__attribute__((always_inline)) static inline uint32_t calculate_checksum(uint32_t const* p,
+                                                                         size_t const size) {
+    uint32_t checksum = 0;
+    for (uint32_t i = 0; i < (size / sizeof(uint32_t)) - 1; i++) {
+        checksum ^= *p;
+        p++;
+    }
+    return checksum;
 }
-
 
 // from Google Chromium's codebase:
-#ifndef COUNT_OF    
-#define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
+#ifndef COUNT_OF
+#define COUNT_OF(x) ((sizeof(x) / sizeof(0 [x])) / ((size_t)(!(sizeof(x) % sizeof(0 [x])))))
 #endif
 
 __attribute__((always_inline)) static inline void __DSB(void) {

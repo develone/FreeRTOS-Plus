@@ -20,8 +20,6 @@ bool sd_spi_transfer(sd_card_t *pSD, const uint8_t *tx, uint8_t *rx, size_t leng
 uint8_t sd_spi_write(sd_card_t *pSD, const uint8_t value);
 void sd_spi_acquire(sd_card_t *pSD);
 void sd_spi_release(sd_card_t *pSD);
-//void sd_spi_select(sd_card_t *pSD);
-//void sd_spi_deselect(sd_card_t *pSD);
 void sd_spi_go_low_frequency(sd_card_t *pSD);
 void sd_spi_go_high_frequency(sd_card_t *pSD);
 

@@ -1,20 +1,10 @@
-/* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
- * ========================================
- */
+
 #include <stdbool.h>
-//
+
 #include "pico/stdlib.h"
-//
+
 #include "FreeRTOS.h"
-//
+
 #include "spi.h"
 
 void spi_irq_handler(spi_t *pSPI) {
@@ -184,12 +174,18 @@ bool my_spi_init(spi_t *pSPI) {
     dma_channel_set_irq0_enabled(pSPI->rx_dma, true);
     irq_set_enabled(pSPI->irq_num, true);
 
-    LED_INIT();
-
     xSemaphoreGiveRecursive(pSPI->mutex);
     pSPI->initialized = true;
     
     return true;
 }
 
-/* [] END OF FILE */
+void spi_lock(spi_t* pSPI) {
+    pSPI->owner = xTaskGetCurrentTaskHandle();
+    xSemaphoreTakeRecursive(pSPI->mutex, portMAX_DELAY);
+}
+
+void spi_unlock(spi_t* pSPI) {
+    pSPI->owner = 0;
+    xSemaphoreGiveRecursive(pSPI->mutex);
+}

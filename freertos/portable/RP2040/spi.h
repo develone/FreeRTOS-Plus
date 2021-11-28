@@ -51,6 +51,8 @@ void spi_irq_handler(spi_t *pSPI);
 
 bool spi_transfer(spi_t *pSPI, const uint8_t *tx, uint8_t *rx, size_t length);
 bool my_spi_init(spi_t *pSPI);
+void spi_lock(spi_t* pSPI);
+void spi_unlock(spi_t* pSPI);
 
 #define USE_LED 1
 #if USE_LED

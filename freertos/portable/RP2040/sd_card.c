@@ -149,11 +149,11 @@
 /* Standard includes. */
 #include <inttypes.h>
 #include <string.h>
-//
+
 #include "my_debug.h"
 #include "hw_config.h" // Hardware Configuration of the SPI and SD Card "objects"
 #include "sd_spi.h"
-//
+
 #include "sd_card.h"
 
 #define SD_CRC_ENABLED 1
@@ -480,7 +480,7 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
     // Get rest of the response part for other commands
     switch (cmd) {
         case CMD8_SEND_IF_COND:  // Response R7
-            DBG_PRINTF("V2-Version Card\n");
+            printf("V2-Version Card\n");
             pSD->card_type = SDCARD_V2;  // fallthrough
             // Note: No break here, need to read rest of the response
         case CMD58_READ_OCR:  // Response R3
@@ -488,7 +488,7 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
             response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 16);
             response |= (sd_spi_write(pSD, SPI_FILL_CHAR) << 8);
             response |= sd_spi_write(pSD, SPI_FILL_CHAR);
-            DBG_PRINTF("R3/R7: 0x%" PRIx32 "\n", response);
+            // DBG_PRINTF("R3/R7: 0x%" PRIx32 "\n", response);
             break;
 
         case CMD12_STOP_TRANSMISSION:  // Response R1b
@@ -498,7 +498,7 @@ static int sd_cmd(sd_card_t *pSD, const cmdSupported cmd, uint32_t arg,
 
         case ACMD13_SD_STATUS:  // Response R2
             response = sd_spi_write(pSD, SPI_FILL_CHAR);
-            DBG_PRINTF("R2: 0x%" PRIx32 "\n", response);
+            // DBG_PRINTF("R2: 0x%" PRIx32 "\n", response);
             break;
 
         default:  // Response R1
@@ -741,10 +741,9 @@ static uint64_t sd_sectors_nolock(sd_card_t *pSD) {
             capacity = (uint64_t)blocknr *
                        block_len;  // memory capacity = BLOCKNR * BLOCK_LEN
             blocks = capacity / _block_size;
-            DBG_PRINTF("Standard Capacity: c_size: %" PRIu32 "\n", c_size);
-            DBG_PRINTF("Sectors: 0x%llx : %llu\n", blocks, blocks);
-            DBG_PRINTF("Capacity: 0x%llx : %llu MB\n", capacity,
-                       (capacity / (1024U * 1024U)));
+            printf("Standard Capacity: c_size: %" PRIu32 "\n", c_size);
+            printf("Sectors: 0x%llx : %llu\n", blocks, blocks);
+            printf("Capacity: 0x%llx : %llu MB\n", capacity, (capacity / (1024U * 1024U)));
             break;
 
         case 1:
@@ -752,13 +751,13 @@ static uint64_t sd_sectors_nolock(sd_card_t *pSD) {
                 ext_bits(csd, 69, 48);       // device size : C_SIZE : [69:48]
             blocks = (hc_c_size + 1) << 10;  // block count = C_SIZE+1) * 1K
                                              // byte (512B is block size)
-            DBG_PRINTF("SDHC/SDXC Card: hc_c_size: %" PRIu32 "\n", hc_c_size);
-            DBG_PRINTF("Sectors: %8llu\n", blocks);
-            DBG_PRINTF("Capacity: %8llu MB\n", (blocks / (2048U)));
+            printf("SDHC/SDXC Card: hc_c_size: %" PRIu32 "\n", hc_c_size);
+            printf("Sectors: %8llu\n", blocks);
+            printf("Capacity: %8llu MB\n", (blocks / (2048U)));
             break;
 
         default:
-            DBG_PRINTF("CSD struct unsupported\n");
+            printf("CSD struct unsupported\n");
             configASSERT(!"CSD struct unsupported\n");
             return 0;
     };
@@ -801,11 +800,11 @@ int sd_init_card(sd_card_t *pSD) {
 
     int err = sd_initialise_card(pSD);
     if (SD_BLOCK_DEVICE_ERROR_NONE != err) {
-        DBG_PRINTF("Failed to initialize card\n");
+        printf("Failed to initialize card\n");
         xSemaphoreGiveRecursive(pSD->mutex);
         return pSD->m_Status;
     }
-    DBG_PRINTF("SD card initialized\n");
+    printf("SD card initialized\n");
     pSD->sectors = sd_sectors(pSD);
     if (0 == pSD->sectors) {
         // CMD9 failed
